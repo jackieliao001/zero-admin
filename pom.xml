@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.zero</groupId>
+    <artifactId>zero-admin</artifactId>
+    <version>0.0.1</version>
+    <name>${project.artifactId}</name>
+    <description>零点框架 后台管理</description>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.2</version>
+    </parent>
+    <!--统一管理模板-->
+    <modules>
+        <module>zero-common</module>
+        <module>zero-system</module>
+<!--         <module>zero-core</module>-->
+<!--        <module>zero-admin-api</module>-->
+
+<!--        <module>zero-admin-web</module>-->
+        <!--        <module>zero-logging</module>-->
+<!--        <module>zero-tools</module>-->
+<!--        <module>zero-web</module>-->
+<!--        <module>zero-generator</module>-->
+<!--        <module>zero-quartz</module>-->
+    </modules>
+
+
+    <!--统一全局版本管理-->
+    <properties>
+        <zero.version>0.0.1</zero.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+
+        <hutool.all.version>4.5.10</hutool.all.version>
+        <tk.mybatis.version>4.2.1</tk.mybatis.version>
+        <pagehelper.starter.version>1.4.1</pagehelper.starter.version>
+        <druid.version>1.2.8</druid.version>
+        <fastjson.version>1.2.80</fastjson.version>
+        <jsoup.version>1.11.3</jsoup.version>
+
+        <nekohtml.version>1.9.22</nekohtml.version>
+        <commons.lang3.version>3.7</commons.lang3.version>
+        <commons.fileupload.version>1.3.3</commons.fileupload.version>
+        <kaptcha.version>2.3.2</kaptcha.version>
+        <spring4all.swagger2.version>1.9.0.RELEASE</spring4all.swagger2.version>
+<!--        <springfox.swagger2.version>2.8.0</springfox.swagger2.version>-->
+<!--        <springfox.swagger.ui.version>2.8.0</springfox.swagger.ui.version>-->
+        <xxl.sso.core.version>1.1.0</xxl.sso.core.version>
+
+    </properties>
+
+
+    <!--全局公共依赖-->
+    <dependencies>
+
+        <!--lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+    </dependencies>
+
+</project>

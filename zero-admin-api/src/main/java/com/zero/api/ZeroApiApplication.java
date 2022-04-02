@@ -1,30 +1,25 @@
-package com.zero;
-
+package com.zero.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 后台启动入口
+ * web入口启动类
  *
  * @author liaojunjie
- * @date 2022/3/28 16:51
+ * @date 2022/4/1 18:38
  */
-@EnableAsync
-@RestController
-@SpringBootApplication
-@EnableTransactionManagement
-public class ZeroAdminApplication {
+@SpringBootApplication(scanBasePackages = {"com.zero"})
+//@MapperScan("com.zero.**.mapper")
+public class ZeroApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication springApplication = new SpringApplication(ZeroAdminApplication.class);
+        SpringApplication springApplication = new SpringApplication(ZeroApiApplication.class);
         // 监控应用的PID，启动时可指定PID路径：--spring.pid.file=/home/eladmin/app.pid
         // 或者在 application.yml 添加文件路径，方便 kill，kill `cat /home/eladmin/app.pid`
 //        springApplication.addListeners(new ApplicationPidFileWriter());
         springApplication.run(args);
+        System.out.println("↖(^ω^)↗  零点启动成功！ ♪(＾∀＾●)ﾉ");
     }
 
 /*    @Bean

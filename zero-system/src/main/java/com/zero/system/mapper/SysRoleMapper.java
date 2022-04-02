@@ -1,7 +1,6 @@
 package com.zero.system.mapper;
 
 import com.zero.system.domain.SysRole;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
@@ -10,7 +9,6 @@ import java.util.List;
  *
  * @author ruoyi
  */
-@Mapper
 public interface SysRoleMapper {
     /**
      * 根据条件分页查询角色数据

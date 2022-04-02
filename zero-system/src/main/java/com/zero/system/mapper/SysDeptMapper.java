@@ -1,7 +1,6 @@
 package com.zero.system.mapper;
 
 import com.zero.system.domain.SysDept;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
  *
  * @author ruoyi
  */
-@Mapper
 public interface SysDeptMapper {
     /**
      * 查询部门人数

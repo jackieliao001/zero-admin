@@ -1,7 +1,6 @@
 package com.zero.system.mapper;
 
 import com.zero.system.domain.SysUserPost;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
@@ -10,7 +9,6 @@ import java.util.List;
  *
  * @author ruoyi
  */
-@Mapper
 public interface SysUserPostMapper {
     /**
      * 通过用户ID删除用户和岗位关联

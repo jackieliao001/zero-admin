@@ -1,7 +1,6 @@
 package com.zero.system.mapper;
 
 import com.zero.system.domain.SysRoleMenu;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
@@ -10,7 +9,6 @@ import java.util.List;
  *
  * @author ruoyi
  */
-@Mapper
 public interface SysRoleMenuMapper {
     /**
      * 通过角色ID删除角色和菜单关联

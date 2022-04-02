@@ -11,8 +11,7 @@ import com.zero.common.utils.DateUtils;
 import com.zero.common.utils.ServletUtils;
 import com.zero.common.utils.StringUtils;
 import com.zero.common.utils.sql.SqlUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 
@@ -24,12 +23,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * web层通用数据处理
+ * web层通用控制
  *
- * @author ruoyi
+ * @author liaojunjie
+ * @date 2022/4/2 10:04
  */
+@Slf4j
 public class BaseController {
-    protected final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     /**
      * 将前台传递过来的日期格式的字符串，自动转化为Date类型

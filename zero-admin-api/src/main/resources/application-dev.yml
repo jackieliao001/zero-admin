@@ -37,8 +37,9 @@ spring:
       statViewServlet:
         enabled: true
         # 设置白名单，不填则允许所有访问
-        allow:
-          url-pattern: /monitor/druid/*
+        url-pattern: /monitor/druid/*
+        login-username: user
+        login-password: user
       #配置扩展插件，常用的插件有=>stat:监控统计  log4j:日志  wall:防御sql注入
       filter:
         stat:

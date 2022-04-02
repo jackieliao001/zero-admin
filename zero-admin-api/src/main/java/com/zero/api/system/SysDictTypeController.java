@@ -3,14 +3,14 @@ package com.zero.api.system;
 import com.zero.common.annotation.Log;
 import com.zero.common.base.controller.BaseController;
 import com.zero.common.base.domain.AjaxResult;
+import com.zero.common.base.domain.entity.SysDictType;
 import com.zero.common.base.page.TableDataInfo;
+import com.zero.common.constant.UserConstants;
 import com.zero.common.enums.BusinessType;
-import com.zero.common.utils.security.SecurityUtils;
-import com.zero.system.domain.SysDictType;
 import com.zero.system.service.ISysDictTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,101 +18,96 @@ import java.util.List;
 /**
  * 数据字典信息
  *
- * @author zero
+ * @author ruoyi
  */
-@Controller
-@RequestMapping("/system/dict")
+@RestController
+@RequestMapping("/system/dict/type")
 public class SysDictTypeController extends BaseController {
-    private String prefix = "system/dict/type";
-
     @Autowired
     private ISysDictTypeService dictTypeService;
 
-    // @RequiresPermissions("system:dict:view")
-    @GetMapping()
-    public String dictType() {
-        return prefix + "/type";
-    }
-
-    @PostMapping("/list")
-    // @RequiresPermissions("system:dict:list")
-    @ResponseBody
+    @PreAuthorize("@ss.hasPermi('system:dict:list')")
+    @GetMapping("/list")
     public TableDataInfo list(SysDictType dictType) {
         startPage();
         List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
         return getDataTable(list);
     }
 
+/*    @Log(title = "字典类型", businessType = BusinessType.EXPORT)
+    @PreAuthorize("@ss.hasPermi('system:dict:export')")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysDictType dictType) {
+        List<SysDictType> list = dictTypeService.selectDictTypeList(dictType);
+        ExcelUtil<SysDictType> util = new ExcelUtil<SysDictType>(SysDictType.class);
+        util.exportExcel(response, list, "字典类型");
+    }*/
+
     /**
-     * 新增字典类型
+     * 查询字典类型详细
      */
-    @GetMapping("/add")
-    public String add() {
-        return prefix + "/add";
+    @PreAuthorize("@ss.hasPermi('system:dict:query')")
+    @GetMapping(value = "/{dictId}")
+    public AjaxResult getInfo(@PathVariable Long dictId) {
+        return AjaxResult.success(dictTypeService.selectDictTypeById(dictId));
     }
 
     /**
-     * 新增保存字典类型
+     * 新增字典类型
      */
+    @PreAuthorize("@ss.hasPermi('system:dict:add')")
     @Log(title = "字典类型", businessType = BusinessType.INSERT)
-    // @RequiresPermissions("system:dict:add")
-    @PostMapping("/add")
-    @ResponseBody
-    public AjaxResult addSave(SysDictType dict) {
-        dict.setCreateBy(SecurityUtils.getCurrentUsername());
+    @PostMapping
+    public AjaxResult add(@Validated @RequestBody SysDictType dict) {
+        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
+            return AjaxResult.error("新增字典'" + dict.getDictName() + "'失败，字典类型已存在");
+        }
+        dict.setCreateBy(getUsername());
         return toAjax(dictTypeService.insertDictType(dict));
     }
 
     /**
      * 修改字典类型
      */
-    @GetMapping("/edit/{dictId}")
-    public String edit(@PathVariable("dictId") Long dictId, ModelMap mmap) {
-        mmap.put("dict", dictTypeService.selectDictTypeById(dictId));
-        return prefix + "/edit";
-    }
-
-    /**
-     * 修改保存字典类型
-     */
+    @PreAuthorize("@ss.hasPermi('system:dict:edit')")
     @Log(title = "字典类型", businessType = BusinessType.UPDATE)
-    // @RequiresPermissions("system:dict:edit")
-    @PostMapping("/edit")
-    @ResponseBody
-    public AjaxResult editSave(SysDictType dict) {
-        dict.setUpdateBy(SecurityUtils.getCurrentUsername());
+    @PutMapping
+    public AjaxResult edit(@Validated @RequestBody SysDictType dict) {
+        if (UserConstants.NOT_UNIQUE.equals(dictTypeService.checkDictTypeUnique(dict))) {
+            return AjaxResult.error("修改字典'" + dict.getDictName() + "'失败，字典类型已存在");
+        }
+        dict.setUpdateBy(getUsername());
         return toAjax(dictTypeService.updateDictType(dict));
     }
 
+    /**
+     * 删除字典类型
+     */
+    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
-    // @RequiresPermissions("system:dict:remove")
-    @PostMapping("/remove")
-    @ResponseBody
-    public AjaxResult remove(String ids) {
-        try {
-            return toAjax(dictTypeService.deleteDictTypeByIds(ids));
-        } catch (Exception e) {
-            return error(e.getMessage());
-        }
+    @DeleteMapping("/{dictIds}")
+    public AjaxResult remove(@PathVariable Long[] dictIds) {
+        dictTypeService.deleteDictTypeByIds(dictIds);
+        return success();
     }
 
     /**
-     * 查询字典详细
+     * 刷新字典缓存
      */
-    // @RequiresPermissions("system:dict:list")
-    @GetMapping("/detail/{dictId}")
-    public String detail(@PathVariable("dictId") Long dictId, ModelMap mmap) {
-        mmap.put("dict", dictTypeService.selectDictTypeById(dictId));
-        mmap.put("dictList", dictTypeService.selectDictTypeAll());
-        return "system/dict/data/data";
+    @PreAuthorize("@ss.hasPermi('system:dict:remove')")
+    @Log(title = "字典类型", businessType = BusinessType.CLEAN)
+    @DeleteMapping("/refreshCache")
+    public AjaxResult refreshCache() {
+        dictTypeService.resetDictCache();
+        return AjaxResult.success();
     }
 
     /**
-     * 校验字典类型
+     * 获取字典选择框列表
      */
-    @PostMapping("/checkDictTypeUnique")
-    @ResponseBody
-    public String checkDictTypeUnique(SysDictType dictType) {
-        return dictTypeService.checkDictTypeUnique(dictType);
+    @GetMapping("/optionselect")
+    public AjaxResult optionselect() {
+        List<SysDictType> dictTypes = dictTypeService.selectDictTypeAll();
+        return AjaxResult.success(dictTypes);
     }
 }

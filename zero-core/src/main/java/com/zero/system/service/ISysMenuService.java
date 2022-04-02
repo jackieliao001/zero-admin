@@ -1,114 +1,110 @@
 package com.zero.system.service;
 
-import com.zero.common.base.domain.Ztree;
-import com.zero.system.domain.SysMenu;
-import com.zero.system.domain.SysRole;
-import com.zero.system.domain.SysUser;
+import com.zero.common.base.domain.TreeNode;
+import com.zero.common.base.domain.entity.SysMenu;
+import com.zero.system.domain.vo.RouterVo;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * 菜单 业务层
- * 
+ *
  * @author ruoyi
  */
-public interface ISysMenuService
-{
+public interface ISysMenuService {
     /**
-     * 根据用户ID查询菜单
-     * 
-     * @param user 用户信息
+     * 根据用户查询系统菜单列表
+     *
+     * @param userId 用户ID
      * @return 菜单列表
      */
-    public List<SysMenu> selectMenusByUser(SysUser user);
+    public List<SysMenu> selectMenuList(Long userId);
 
     /**
-     * 查询系统菜单列表
-     * 
-     * @param menu 菜单信息
+     * 根据用户查询系统菜单列表
+     *
+     * @param menu   菜单信息
      * @param userId 用户ID
      * @return 菜单列表
      */
     public List<SysMenu> selectMenuList(SysMenu menu, Long userId);
 
     /**
-     * 查询菜单集合
-     * 
-     * @param userId 用户ID
-     * @return 所有菜单信息
-     */
-    public List<SysMenu> selectMenuAll(Long userId);
-
-    /**
      * 根据用户ID查询权限
-     * 
+     *
      * @param userId 用户ID
      * @return 权限列表
      */
-    public Set<String> selectPermsByUserId(Long userId);
+    public Set<String> selectMenuPermsByUserId(Long userId);
 
     /**
-     * 根据角色ID查询菜单
-     * 
-     * @param role 角色对象
+     * 根据用户ID查询菜单树信息
+     *
      * @param userId 用户ID
      * @return 菜单列表
      */
-    public List<Ztree> roleMenuTreeData(SysRole role, Long userId);
+    public List<SysMenu> selectMenuTreeByUserId(Long userId);
 
     /**
-     * 查询所有菜单信息
-     * 
-     * @param userId 用户ID
-     * @return 菜单列表
+     * 根据角色ID查询菜单树信息
+     *
+     * @param roleId 角色ID
+     * @return 选中菜单列表
      */
-    public List<Ztree> menuTreeData(Long userId);
+    public List<Long> selectMenuListByRoleId(Long roleId);
 
     /**
-     * 查询系统所有权限
-     * 
-     * @param userId 用户ID
-     * @return 权限列表
+     * 构建前端路由所需要的菜单
+     *
+     * @param menus 菜单列表
+     * @return 路由列表
      */
-    public Map<String, String> selectPermsAll(Long userId);
+    public List<RouterVo> buildMenus(List<SysMenu> menus);
 
     /**
-     * 删除菜单管理信息
-     * 
-     * @param menuId 菜单ID
-     * @return 结果
+     * 构建前端所需要树结构
+     *
+     * @param menus 菜单列表
+     * @return 树结构列表
      */
-    public int deleteMenuById(Long menuId);
+    public List<SysMenu> buildMenuTree(List<SysMenu> menus);
+
+    /**
+     * 构建前端所需要下拉树结构
+     *
+     * @param menus 菜单列表
+     * @return 下拉树结构列表
+     */
+    public List<TreeNode> buildMenuTreeSelect(List<SysMenu> menus);
 
     /**
      * 根据菜单ID查询信息
-     * 
+     *
      * @param menuId 菜单ID
      * @return 菜单信息
      */
     public SysMenu selectMenuById(Long menuId);
 
     /**
-     * 查询菜单数量
-     * 
-     * @param parentId 菜单父ID
-     * @return 结果
+     * 是否存在菜单子节点
+     *
+     * @param menuId 菜单ID
+     * @return 结果 true 存在 false 不存在
      */
-    public int selectCountMenuByParentId(Long parentId);
+    public boolean hasChildByMenuId(Long menuId);
 
     /**
-     * 查询菜单使用数量
-     * 
+     * 查询菜单是否存在角色
+     *
      * @param menuId 菜单ID
-     * @return 结果
+     * @return 结果 true 存在 false 不存在
      */
-    public int selectCountRoleMenuByMenuId(Long menuId);
+    public boolean checkMenuExistRole(Long menuId);
 
     /**
      * 新增保存菜单信息
-     * 
+     *
      * @param menu 菜单信息
      * @return 结果
      */
@@ -116,15 +112,23 @@ public interface ISysMenuService
 
     /**
      * 修改保存菜单信息
-     * 
+     *
      * @param menu 菜单信息
      * @return 结果
      */
     public int updateMenu(SysMenu menu);
 
     /**
+     * 删除菜单管理信息
+     *
+     * @param menuId 菜单ID
+     * @return 结果
+     */
+    public int deleteMenuById(Long menuId);
+
+    /**
      * 校验菜单名称是否唯一
-     * 
+     *
      * @param menu 菜单信息
      * @return 结果
      */

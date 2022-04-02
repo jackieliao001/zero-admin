@@ -2,7 +2,7 @@ package com.zero.api.vo;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.zero.system.domain.SysMenu;
+import com.zero.common.base.domain.entity.SysMenu;
 import lombok.Data;
 
 import java.util.HashMap;

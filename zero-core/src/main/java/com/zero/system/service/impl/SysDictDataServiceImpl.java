@@ -1,8 +1,7 @@
 package com.zero.system.service.impl;
 
-
-import cn.hutool.core.convert.Convert;
-import com.zero.system.domain.SysDictData;
+import com.zero.common.base.domain.entity.SysDictData;
+import com.zero.common.utils.DictUtils;
 import com.zero.system.mapper.SysDictDataMapper;
 import com.zero.system.service.ISysDictDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +31,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     }
 
     /**
-     * 根据字典类型查询字典数据
-     *
-     * @param dictType 字典类型
-     * @return 字典数据集合信息
-     */
-    @Override
-    public List<SysDictData> selectDictDataByType(String dictType) {
-        return dictDataMapper.selectDictDataByType(dictType);
-    }
-
-    /**
      * 根据字典类型和字典键值查询字典数据信息
      *
      * @param dictType  字典类型
@@ -66,46 +54,49 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
     }
 
     /**
-     * 通过字典ID删除字典数据信息
+     * 批量删除字典数据信息
      *
-     * @param dictCode 字典数据ID
-     * @return 结果
+     * @param dictCodes 需要删除的字典数据ID
      */
     @Override
-    public int deleteDictDataById(Long dictCode) {
-        return dictDataMapper.deleteDictDataById(dictCode);
-    }
-
-    /**
-     * 批量删除字典数据
-     *
-     * @param ids 需要删除的数据
-     * @return 结果
-     */
-    @Override
-    public int deleteDictDataByIds(String ids) {
-        return dictDataMapper.deleteDictDataByIds(Convert.toStrArray(ids));
+    public void deleteDictDataByIds(Long[] dictCodes) {
+        for (Long dictCode : dictCodes) {
+            SysDictData data = selectDictDataById(dictCode);
+            dictDataMapper.deleteDictDataById(dictCode);
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            DictUtils.setDictCache(data.getDictType(), dictDatas);
+        }
     }
 
     /**
      * 新增保存字典数据信息
      *
-     * @param dictData 字典数据信息
+     * @param data 字典数据信息
      * @return 结果
      */
     @Override
-    public int insertDictData(SysDictData dictData) {
-        return dictDataMapper.insertDictData(dictData);
+    public int insertDictData(SysDictData data) {
+        int row = dictDataMapper.insertDictData(data);
+        if (row > 0) {
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            DictUtils.setDictCache(data.getDictType(), dictDatas);
+        }
+        return row;
     }
 
     /**
      * 修改保存字典数据信息
      *
-     * @param dictData 字典数据信息
+     * @param data 字典数据信息
      * @return 结果
      */
     @Override
-    public int updateDictData(SysDictData dictData) {
-        return dictDataMapper.updateDictData(dictData);
+    public int updateDictData(SysDictData data) {
+        int row = dictDataMapper.updateDictData(data);
+        if (row > 0) {
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(data.getDictType());
+            DictUtils.setDictCache(data.getDictType(), dictDatas);
+        }
+        return row;
     }
 }

@@ -5,7 +5,7 @@ import com.zero.system.domain.SysNotice;
 import java.util.List;
 
 /**
- * 公告 数据层
+ * 通知公告表 数据层
  *
  * @author ruoyi
  */
@@ -16,7 +16,7 @@ public interface SysNoticeMapper {
      * @param noticeId 公告ID
      * @return 公告信息
      */
-    SysNotice selectNoticeById(Long noticeId);
+    public SysNotice selectNoticeById(Long noticeId);
 
     /**
      * 查询公告列表
@@ -24,7 +24,7 @@ public interface SysNoticeMapper {
      * @param notice 公告信息
      * @return 公告集合
      */
-    List<SysNotice> selectNoticeList(SysNotice notice);
+    public List<SysNotice> selectNoticeList(SysNotice notice);
 
     /**
      * 新增公告
@@ -32,7 +32,7 @@ public interface SysNoticeMapper {
      * @param notice 公告信息
      * @return 结果
      */
-    int insertNotice(SysNotice notice);
+    public int insertNotice(SysNotice notice);
 
     /**
      * 修改公告
@@ -40,13 +40,21 @@ public interface SysNoticeMapper {
      * @param notice 公告信息
      * @return 结果
      */
-    int updateNotice(SysNotice notice);
+    public int updateNotice(SysNotice notice);
 
     /**
      * 批量删除公告
      *
-     * @param noticeIds 需要删除的数据ID
+     * @param noticeId 公告ID
      * @return 结果
      */
-    int deleteNoticeByIds(String[] noticeIds);
+    public int deleteNoticeById(Long noticeId);
+
+    /**
+     * 批量删除公告信息
+     *
+     * @param noticeIds 需要删除的公告ID
+     * @return 结果
+     */
+    public int deleteNoticeByIds(Long[] noticeIds);
 }

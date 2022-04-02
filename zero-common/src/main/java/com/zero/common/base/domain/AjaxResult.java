@@ -1,8 +1,7 @@
 package com.zero.common.base.domain;
 
 import com.zero.common.utils.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 
@@ -12,26 +11,22 @@ import java.util.HashMap;
  * @author ruoyi
  */
 public class AjaxResult extends HashMap<String, Object> {
-    public static final String CODE_TAG = "code";
-    public static final String MSG_TAG = "msg";
-    public static final String DATA_TAG = "data";
     private static final long serialVersionUID = 1L;
-    /**
-     * 状态类型
-     */
-    private Type type;
+
     /**
      * 状态码
      */
-    private int code;
+    public static final String CODE_TAG = "code";
+
     /**
      * 返回内容
      */
-    private String msg;
+    public static final String MSG_TAG = "msg";
+
     /**
      * 数据对象
      */
-    private Object data;
+    public static final String DATA_TAG = "data";
 
     /**
      * 初始化一个新创建的 AjaxResult 对象，使其表示一个空消息。
@@ -42,23 +37,23 @@ public class AjaxResult extends HashMap<String, Object> {
     /**
      * 初始化一个新创建的 AjaxResult 对象
      *
-     * @param type 状态类型
+     * @param code 状态码
      * @param msg  返回内容
      */
-    public AjaxResult(Type type, String msg) {
-        super.put(CODE_TAG, type.value);
+    public AjaxResult(int code, String msg) {
+        super.put(CODE_TAG, code);
         super.put(MSG_TAG, msg);
     }
 
     /**
      * 初始化一个新创建的 AjaxResult 对象
      *
-     * @param type 状态类型
+     * @param code 状态码
      * @param msg  返回内容
      * @param data 数据对象
      */
-    public AjaxResult(Type type, String msg, Object data) {
-        super.put(CODE_TAG, type.value);
+    public AjaxResult(int code, String msg, Object data) {
+        super.put(CODE_TAG, code);
         super.put(MSG_TAG, msg);
         if (StringUtils.isNotNull(data)) {
             super.put(DATA_TAG, data);
@@ -101,28 +96,7 @@ public class AjaxResult extends HashMap<String, Object> {
      * @return 成功消息
      */
     public static AjaxResult success(String msg, Object data) {
-        return new AjaxResult(Type.SUCCESS, msg, data);
-    }
-
-    /**
-     * 返回警告消息
-     *
-     * @param msg 返回内容
-     * @return 警告消息
-     */
-    public static AjaxResult warn(String msg) {
-        return AjaxResult.warn(msg, null);
-    }
-
-    /**
-     * 返回警告消息
-     *
-     * @param msg  返回内容
-     * @param data 数据对象
-     * @return 警告消息
-     */
-    public static AjaxResult warn(String msg, Object data) {
-        return new AjaxResult(Type.WARN, msg, data);
+        return new AjaxResult(HttpStatus.OK.value(), msg, data);
     }
 
     /**
@@ -152,74 +126,30 @@ public class AjaxResult extends HashMap<String, Object> {
      * @return 警告消息
      */
     public static AjaxResult error(String msg, Object data) {
-        return new AjaxResult(Type.ERROR, msg, data);
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append("code", getCode())
-                .append("msg", getMsg())
-                .append("data", getData())
-                .toString();
+        return new AjaxResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg, data);
     }
 
     /**
-     * 状态类型
+     * 返回错误消息
+     *
+     * @param code 状态码
+     * @param msg  返回内容
+     * @return 警告消息
      */
-    public enum Type {
-        /**
-         * 成功
-         */
-        SUCCESS(0),
-        /**
-         * 警告
-         */
-        WARN(301),
-        /**
-         * 错误
-         */
-        ERROR(500);
-        private final int value;
+    public static AjaxResult error(int code, String msg) {
+        return new AjaxResult(code, msg, null);
+    }
 
-        Type(int value) {
-            this.value = value;
-        }
-
-        public int value() {
-            return this.value;
-        }
+    /**
+     * 方便链式调用
+     *
+     * @param key   键
+     * @param value 值
+     * @return 数据对象
+     */
+    @Override
+    public AjaxResult put(String key, Object value) {
+        super.put(key, value);
+        return this;
     }
 }

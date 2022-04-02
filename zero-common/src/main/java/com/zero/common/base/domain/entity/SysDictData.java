@@ -1,8 +1,12 @@
-package com.zero.system.domain;
+package com.zero.common.base.domain.entity;
 
 import com.zero.common.base.domain.BaseEntity;
+import com.zero.common.constant.Constants;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * 字典数据表 sys_dict_data
@@ -73,6 +77,8 @@ public class SysDictData extends BaseEntity {
         this.dictSort = dictSort;
     }
 
+    @NotBlank(message = "字典标签不能为空")
+    @Size(min = 0, max = 100, message = "字典标签长度不能超过100个字符")
     public String getDictLabel() {
         return dictLabel;
     }
@@ -81,6 +87,8 @@ public class SysDictData extends BaseEntity {
         this.dictLabel = dictLabel;
     }
 
+    @NotBlank(message = "字典键值不能为空")
+    @Size(min = 0, max = 100, message = "字典键值长度不能超过100个字符")
     public String getDictValue() {
         return dictValue;
     }
@@ -89,6 +97,8 @@ public class SysDictData extends BaseEntity {
         this.dictValue = dictValue;
     }
 
+    @NotBlank(message = "字典类型不能为空")
+    @Size(min = 0, max = 100, message = "字典类型长度不能超过100个字符")
     public String getDictType() {
         return dictType;
     }
@@ -97,6 +107,7 @@ public class SysDictData extends BaseEntity {
         this.dictType = dictType;
     }
 
+    @Size(min = 0, max = 100, message = "样式属性长度不能超过100个字符")
     public String getCssClass() {
         return cssClass;
     }
@@ -111,6 +122,10 @@ public class SysDictData extends BaseEntity {
 
     public void setListClass(String listClass) {
         this.listClass = listClass;
+    }
+
+    public boolean getDefault() {
+        return Constants.YES.equals(this.isDefault);
     }
 
     public String getIsDefault() {
@@ -149,3 +164,4 @@ public class SysDictData extends BaseEntity {
                 .toString();
     }
 }
+

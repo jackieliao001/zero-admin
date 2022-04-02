@@ -1,6 +1,6 @@
 package com.zero.system.mapper;
 
-import com.zero.system.domain.SysDictData;
+import com.zero.common.base.domain.entity.SysDictData;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

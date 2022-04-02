@@ -7,9 +7,28 @@ package com.zero.common.constant;
  */
 public class Constants {
     /**
+     * 是否为系统默认（是）
+     */
+    public static final String YES = "Y";
+    /**
      * UTF-8 字符集
      */
     public static final String UTF8 = "UTF-8";
+
+    /**
+     * GBK 字符集
+     */
+    public static final String GBK = "GBK";
+
+    /**
+     * http请求
+     */
+    public static final String HTTP = "http://";
+
+    /**
+     * https请求
+     */
+    public static final String HTTPS = "https://";
 
     /**
      * 通用成功标识
@@ -32,32 +51,93 @@ public class Constants {
     public static final String LOGOUT = "Logout";
 
     /**
+     * 注册
+     */
+    public static final String REGISTER = "Register";
+
+    /**
      * 登录失败
      */
     public static final String LOGIN_FAIL = "Error";
 
     /**
-     * 自动去除表前缀
+     * 验证码 redis key
      */
-    public static final String AUTO_REOMVE_PRE = "true";
+    public static final String CAPTCHA_CODE_KEY = "captcha_codes:";
 
     /**
-     * 当前记录起始索引
+     * 登录用户 redis key
      */
-    public static final String PAGE_NUM = "pageNum";
+    public static final String LOGIN_TOKEN_KEY = "login_tokens:";
 
     /**
-     * 每页显示记录数
+     * 防重提交 redis key
      */
-    public static final String PAGE_SIZE = "pageSize";
+    public static final String REPEAT_SUBMIT_KEY = "repeat_submit:";
 
     /**
-     * 排序列
+     * 限流 redis key
      */
-    public static final String ORDER_BY_COLUMN = "orderByColumn";
+    public static final String RATE_LIMIT_KEY = "rate_limit:";
 
     /**
-     * 排序的方向 "desc" 或者 "asc".
+     * 验证码有效期（分钟）
      */
-    public static final String IS_ASC = "isAsc";
+    public static final Integer CAPTCHA_EXPIRATION = 2;
+
+    /**
+     * 令牌
+     */
+    public static final String TOKEN = "token";
+
+    /**
+     * 令牌前缀
+     */
+    public static final String TOKEN_PREFIX = "Bearer ";
+
+    /**
+     * 令牌前缀
+     */
+    public static final String LOGIN_USER_KEY = "login_user_key";
+
+    /**
+     * 用户ID
+     */
+    public static final String JWT_USERID = "userid";
+
+    /**
+     * 用户头像
+     */
+    public static final String JWT_AVATAR = "avatar";
+
+    /**
+     * 创建时间
+     */
+    public static final String JWT_CREATED = "created";
+
+    /**
+     * 用户权限
+     */
+    public static final String JWT_AUTHORITIES = "authorities";
+
+    /**
+     * 参数管理 cache key
+     */
+    public static final String SYS_CONFIG_KEY = "sys_config:";
+
+    /**
+     * 字典管理 cache key
+     */
+    public static final String SYS_DICT_KEY = "sys_dict:";
+
+    /**
+     * 资源映射路径 前缀
+     */
+    public static final String RESOURCE_PREFIX = "/profile";
+
+    /**
+     * 定时任务违规的字符
+     */
+    public static final String[] JOB_ERROR_STR = {"java.net.URL", "javax.naming.InitialContext", "org.yaml.snakeyaml",
+            "org.springframework", "org.apache", "com.ruoyi.common.utils.file"};
 }

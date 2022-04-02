@@ -1,11 +1,17 @@
-package com.zero.system.domain;
+package com.zero.common.base.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.zero.common.base.domain.BaseEntity;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
+
 
 /**
  * 用户对象 sys_user
@@ -26,24 +32,14 @@ public class SysUser extends BaseEntity {
     private Long deptId;
 
     /**
-     * 部门父ID
-     */
-    private Long parentId;
-
-    /**
-     * 角色ID
-     */
-    private Long roleId;
-
-    /**
-     * 登录名称
-     */
-    private String loginName;
-
-    /**
-     * 用户名称
+     * 用户账号
      */
     private String userName;
+
+    /**
+     * 用户昵称
+     */
+    private String nickName;
 
     /**
      * 用户邮箱
@@ -86,12 +82,12 @@ public class SysUser extends BaseEntity {
     private String delFlag;
 
     /**
-     * 最后登陆IP
+     * 最后登录IP
      */
     private String loginIp;
 
     /**
-     * 最后登陆时间
+     * 最后登录时间
      */
     private Date loginDate;
 
@@ -100,6 +96,9 @@ public class SysUser extends BaseEntity {
      */
     private SysDept dept;
 
+    /**
+     * 角色对象
+     */
     private List<SysRole> roles;
 
     /**
@@ -112,8 +111,17 @@ public class SysUser extends BaseEntity {
      */
     private Long[] postIds;
 
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
+    /**
+     * 角色ID
+     */
+    private Long roleId;
+
+    public SysUser() {
+
+    }
+
+    public SysUser(Long userId) {
+        this.userId = userId;
     }
 
     public Long getUserId() {
@@ -128,6 +136,10 @@ public class SysUser extends BaseEntity {
         return isAdmin(this.userId);
     }
 
+    public static boolean isAdmin(Long userId) {
+        return userId != null && 1L == userId;
+    }
+
     public Long getDeptId() {
         return deptId;
     }
@@ -136,30 +148,17 @@ public class SysUser extends BaseEntity {
         this.deptId = deptId;
     }
 
-    public Long getParentId() {
-        return parentId;
+    @Size(min = 0, max = 30, message = "用户昵称长度不能超过30个字符")
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getLoginName() {
-        return loginName;
-    }
-
-    public void setLoginName(String loginName) {
-        this.loginName = loginName;
-    }
-
+    @NotBlank(message = "用户账号不能为空")
+    @Size(min = 0, max = 30, message = "用户账号长度不能超过30个字符")
     public String getUserName() {
         return userName;
     }
@@ -168,6 +167,8 @@ public class SysUser extends BaseEntity {
         this.userName = userName;
     }
 
+    @Email(message = "邮箱格式不正确")
+    @Size(min = 0, max = 50, message = "邮箱长度不能超过50个字符")
     public String getEmail() {
         return email;
     }
@@ -176,6 +177,7 @@ public class SysUser extends BaseEntity {
         this.email = email;
     }
 
+    @Size(min = 0, max = 11, message = "手机号码长度不能超过11个字符")
     public String getPhonenumber() {
         return phonenumber;
     }
@@ -200,6 +202,8 @@ public class SysUser extends BaseEntity {
         this.avatar = avatar;
     }
 
+    @JsonIgnore
+    @JsonProperty
     public String getPassword() {
         return password;
     }
@@ -249,9 +253,6 @@ public class SysUser extends BaseEntity {
     }
 
     public SysDept getDept() {
-        if (dept == null) {
-            dept = new SysDept();
-        }
         return dept;
     }
 
@@ -283,13 +284,21 @@ public class SysUser extends BaseEntity {
         this.postIds = postIds;
     }
 
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append("userId", getUserId())
                 .append("deptId", getDeptId())
-                .append("loginName", getLoginName())
                 .append("userName", getUserName())
+                .append("nickName", getNickName())
                 .append("email", getEmail())
                 .append("phonenumber", getPhonenumber())
                 .append("sex", getSex())

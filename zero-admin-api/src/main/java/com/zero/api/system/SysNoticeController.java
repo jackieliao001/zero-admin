@@ -1,109 +1,79 @@
 package com.zero.api.system;
 
-
 import com.zero.common.annotation.Log;
 import com.zero.common.base.controller.BaseController;
 import com.zero.common.base.domain.AjaxResult;
 import com.zero.common.base.page.TableDataInfo;
 import com.zero.common.enums.BusinessType;
-import com.zero.common.utils.security.SecurityUtils;
 import com.zero.system.domain.SysNotice;
 import com.zero.system.service.ISysNoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * 公告 信息操作处理
- * 
+ *
  * @author ruoyi
  */
-@Controller
+@RestController
 @RequestMapping("/system/notice")
-public class SysNoticeController extends BaseController
-{
-    private String prefix = "system/notice";
-
+public class SysNoticeController extends BaseController {
     @Autowired
     private ISysNoticeService noticeService;
 
-    // @RequiresPermissions("system:notice:view")
-    @GetMapping()
-    public String notice()
-    {
-        return prefix + "/notice";
-    }
-
     /**
-     * 查询公告列表
+     * 获取通知公告列表
      */
-    // @RequiresPermissions("system:notice:list")
-    @PostMapping("/list")
-    @ResponseBody
-    public TableDataInfo list(SysNotice notice)
-    {
+    @PreAuthorize("@ss.hasPermi('system:notice:list')")
+    @GetMapping("/list")
+    public TableDataInfo list(SysNotice notice) {
         startPage();
         List<SysNotice> list = noticeService.selectNoticeList(notice);
         return getDataTable(list);
     }
 
     /**
-     * 新增公告
+     * 根据通知公告编号获取详细信息
      */
-    @GetMapping("/add")
-    public String add()
-    {
-        return prefix + "/add";
+    @PreAuthorize("@ss.hasPermi('system:notice:query')")
+    @GetMapping(value = "/{noticeId}")
+    public AjaxResult getInfo(@PathVariable Long noticeId) {
+        return AjaxResult.success(noticeService.selectNoticeById(noticeId));
     }
 
     /**
-     * 新增保存公告
+     * 新增通知公告
      */
-    // @RequiresPermissions("system:notice:add")
+    @PreAuthorize("@ss.hasPermi('system:notice:add')")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
-    @PostMapping("/add")
-    @ResponseBody
-    public AjaxResult addSave(SysNotice notice)
-    {
-        notice.setCreateBy(SecurityUtils.getCurrentUsername());
+    @PostMapping
+    public AjaxResult add(@Validated @RequestBody SysNotice notice) {
+        notice.setCreateBy(getUsername());
         return toAjax(noticeService.insertNotice(notice));
     }
 
     /**
-     * 修改公告
+     * 修改通知公告
      */
-    @GetMapping("/edit/{noticeId}")
-    public String edit(@PathVariable("noticeId") Long noticeId, ModelMap mmap)
-    {
-        mmap.put("notice", noticeService.selectNoticeById(noticeId));
-        return prefix + "/edit";
-    }
-
-    /**
-     * 修改保存公告
-     */
-    // @RequiresPermissions("system:notice:edit")
+    @PreAuthorize("@ss.hasPermi('system:notice:edit')")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
-    @PostMapping("/edit")
-    @ResponseBody
-    public AjaxResult editSave(SysNotice notice)
-    {
-        notice.setUpdateBy(SecurityUtils.getCurrentUsername());
+    @PutMapping
+    public AjaxResult edit(@Validated @RequestBody SysNotice notice) {
+        notice.setUpdateBy(getUsername());
         return toAjax(noticeService.updateNotice(notice));
     }
 
     /**
-     * 删除公告
+     * 删除通知公告
      */
-    // @RequiresPermissions("system:notice:remove")
+    @PreAuthorize("@ss.hasPermi('system:notice:remove')")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
-    @PostMapping("/remove")
-    @ResponseBody
-    public AjaxResult remove(String ids)
-    {
-        return toAjax(noticeService.deleteNoticeByIds(ids));
+    @DeleteMapping("/{noticeIds}")
+    public AjaxResult remove(@PathVariable Long[] noticeIds) {
+        return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }
 }

@@ -3,33 +3,32 @@ package com.zero.common.base.controller;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zero.common.base.domain.AjaxResult;
-import com.zero.common.base.domain.AjaxResult.Type;
+import com.zero.common.base.domain.model.LoginUser;
 import com.zero.common.base.page.PageDomain;
 import com.zero.common.base.page.TableDataInfo;
 import com.zero.common.base.page.TableSupport;
 import com.zero.common.utils.DateUtils;
-import com.zero.common.utils.ServletUtils;
+import com.zero.common.utils.PageUtils;
 import com.zero.common.utils.StringUtils;
+import com.zero.common.utils.security.SecurityUtils;
 import com.zero.common.utils.sql.SqlUtil;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.beans.PropertyEditorSupport;
 import java.util.Date;
 import java.util.List;
 
 /**
- * web层通用控制
+ * web层通用数据处理
  *
- * @author liaojunjie
- * @date 2022/4/2 10:04
+ * @author ruoyi
  */
-@Slf4j
 public class BaseController {
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 将前台传递过来的日期格式的字符串，自动转化为Date类型
@@ -49,34 +48,25 @@ public class BaseController {
      * 设置请求分页数据
      */
     protected void startPage() {
+        PageUtils.startPage();
+    }
+
+    /**
+     * 设置请求排序数据
+     */
+    protected void startOrderBy() {
         PageDomain pageDomain = TableSupport.buildPageRequest();
-        Integer pageNum = pageDomain.getPageNum();
-        Integer pageSize = pageDomain.getPageSize();
-        if (StringUtils.isNotNull(pageNum) && StringUtils.isNotNull(pageSize)) {
+        if (StringUtils.isNotEmpty(pageDomain.getOrderBy())) {
             String orderBy = SqlUtil.escapeOrderBySql(pageDomain.getOrderBy());
-            PageHelper.startPage(pageNum, pageSize, orderBy);
+            PageHelper.orderBy(orderBy);
         }
     }
 
     /**
-     * 获取request
+     * 清理分页的线程变量
      */
-    public HttpServletRequest getRequest() {
-        return ServletUtils.getRequest();
-    }
-
-    /**
-     * 获取response
-     */
-    public HttpServletResponse getResponse() {
-        return ServletUtils.getResponse();
-    }
-
-    /**
-     * 获取session
-     */
-    public HttpSession getSession() {
-        return getRequest().getSession();
+    protected void clearPage() {
+        PageUtils.clearPage();
     }
 
     /**
@@ -85,30 +75,11 @@ public class BaseController {
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected TableDataInfo getDataTable(List<?> list) {
         TableDataInfo rspData = new TableDataInfo();
-        rspData.setCode(0);
+        rspData.setCode(HttpStatus.OK.value());
+        rspData.setMsg("查询成功");
         rspData.setRows(list);
         rspData.setTotal(new PageInfo(list).getTotal());
         return rspData;
-    }
-
-    /**
-     * 响应返回结果
-     *
-     * @param rows 影响行数
-     * @return 操作结果
-     */
-    protected AjaxResult toAjax(int rows) {
-        return rows > 0 ? success() : error();
-    }
-
-    /**
-     * 响应返回结果
-     *
-     * @param result 结果
-     * @return 操作结果
-     */
-    protected AjaxResult toAjax(boolean result) {
-        return result ? success() : error();
     }
 
     /**
@@ -140,10 +111,23 @@ public class BaseController {
     }
 
     /**
-     * 返回错误码消息
+     * 响应返回结果
+     *
+     * @param rows 影响行数
+     * @return 操作结果
      */
-    public AjaxResult error(Type type, String message) {
-        return new AjaxResult(type, message);
+    protected AjaxResult toAjax(int rows) {
+        return rows > 0 ? AjaxResult.success() : AjaxResult.error();
+    }
+
+    /**
+     * 响应返回结果
+     *
+     * @param result 结果
+     * @return 操作结果
+     */
+    protected AjaxResult toAjax(boolean result) {
+        return result ? success() : error();
     }
 
     /**
@@ -151,5 +135,33 @@ public class BaseController {
      */
     public String redirect(String url) {
         return StringUtils.format("redirect:{}", url);
+    }
+
+    /**
+     * 获取用户缓存信息
+     */
+    public LoginUser getLoginUser() {
+        return SecurityUtils.getCurrentUser();
+    }
+
+    /**
+     * 获取登录用户id
+     */
+    public Long getUserId() {
+        return getLoginUser().getUserId();
+    }
+
+    /**
+     * 获取登录部门id
+     */
+    public Long getDeptId() {
+        return getLoginUser().getDeptId();
+    }
+
+    /**
+     * 获取登录用户名
+     */
+    public String getUsername() {
+        return getLoginUser().getUsername();
     }
 }

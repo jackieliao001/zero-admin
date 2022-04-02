@@ -7,9 +7,8 @@
         <artifactId>zero-admin</artifactId>
         <version>0.0.1</version>
     </parent>
-    <artifactId>zero-system</artifactId>
-
-    <name>zero-system</name>
+    <artifactId>zero-core</artifactId>
+    <name>zero-core</name>
     <description>后台管理模块service</description>
 
     <dependencies>

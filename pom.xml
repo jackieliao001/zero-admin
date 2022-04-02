@@ -18,14 +18,11 @@
     <!--统一管理模板-->
     <modules>
         <module>zero-common</module>
-        <module>zero-system</module>
+        <module>zero-core</module>
         <module>zero-admin-api</module>
-<!--         <module>zero-core</module>-->
 
-<!--        <module>zero-admin-web</module>-->
         <!--        <module>zero-logging</module>-->
 <!--        <module>zero-tools</module>-->
-<!--        <module>zero-web</module>-->
 <!--        <module>zero-generator</module>-->
 <!--        <module>zero-quartz</module>-->
     </modules>
@@ -110,7 +107,7 @@
             </dependency>
             <dependency>
                 <groupId>com.zero</groupId>
-                <artifactId>zero-system</artifactId>
+                <artifactId>zero-core</artifactId>
                 <version>${zero.version}</version>
             </dependency>
             <dependency>

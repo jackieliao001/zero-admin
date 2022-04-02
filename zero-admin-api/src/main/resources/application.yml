@@ -51,11 +51,9 @@ spring:
       max-file-size:  10MB
       # 设置总上传的文件大小
       max-request-size:  20MB
-  # 服务模块
-  devtools:
-    restart:
-      # 热部署开关
-      enabled: true
+  # 监控应用的PID，启动时可指定PID路径,方便 kill，kill `cat /home/zeroAdmin/app.pid`
+  pid:
+    file: /home/zeroAdmin/app.pid
 
 
 # Redis

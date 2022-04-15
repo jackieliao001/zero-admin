@@ -67,6 +67,7 @@ public class TokenService {
                 LoginUser user = redisCache.getCacheObject(userKey);
                 return user;
             } catch (Exception e) {
+                //todo token错误处理
             }
         }
         return null;

@@ -1,8 +1,10 @@
 package com.zero.common.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
@@ -15,6 +17,7 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -65,16 +68,18 @@ public class RedisConfig extends CachingConfigurerSupport {
     CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         //user信息缓存配置
         RedisCacheConfiguration userCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer()))//key序列化方式
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer()))//value序列化方式
-                .entryTtl(timeToLive)//缓存过期时间
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(keySerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer()))
+                //缓存过期时间
+                .entryTtl(timeToLive)
                 .disableCachingNullValues()
-                .prefixKeysWith("zero");
+                .prefixCacheNameWith("zero");
+
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>(2);
         redisCacheConfigurationMap.put("hope", userCacheConfiguration);
+
         //初始化一个RedisCacheWriter
         RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
-
 
         RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig();
         //设置默认超过期时间是30秒
@@ -98,10 +103,13 @@ public class RedisConfig extends CachingConfigurerSupport {
         // 配置redisTemplate
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
         redisTemplate.setConnectionFactory(lettuceConnectionFactory);
-        redisTemplate.setKeySerializer(keySerializer);// key序列化
-        redisTemplate.setValueSerializer(valueSerializer);// value序列化
-        redisTemplate.setHashKeySerializer(keySerializer);// Hash key序列化
-        redisTemplate.setHashValueSerializer(valueSerializer);// Hash value序列化
+
+        // 使用StringRedisSerializer来序列化和反序列化redis的key值
+        redisTemplate.setKeySerializer(keySerializer);
+        redisTemplate.setValueSerializer(valueSerializer);
+        // Hash的key也采用StringRedisSerializer的序列化方式
+        redisTemplate.setHashKeySerializer(keySerializer);
+        redisTemplate.setHashValueSerializer(valueSerializer);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
@@ -112,13 +120,37 @@ public class RedisConfig extends CachingConfigurerSupport {
 
     private RedisSerializer<Object> valueSerializer() {
         // 设置序列化
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(
-                Object.class);
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
-        return jackson2JsonRedisSerializer;
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        serializer.setObjectMapper(mapper);
+        return serializer;
     }
 
+    @Bean
+    public DefaultRedisScript<Long> limitScript() {
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+        redisScript.setScriptText(limitScriptText());
+        redisScript.setResultType(Long.class);
+        return redisScript;
+    }
+
+    /**
+     * 限流脚本
+     */
+    private String limitScriptText() {
+        return "local key = KEYS[1]\n" +
+                "local count = tonumber(ARGV[1])\n" +
+                "local time = tonumber(ARGV[2])\n" +
+                "local current = redis.call('get', key);\n" +
+                "if current and tonumber(current) > count then\n" +
+                "    return tonumber(current);\n" +
+                "end\n" +
+                "current = redis.call('incr', key)\n" +
+                "if tonumber(current) == 1 then\n" +
+                "    redis.call('expire', key, time)\n" +
+                "end\n" +
+                "return tonumber(current);";
+    }
 }

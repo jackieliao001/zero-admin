@@ -2,14 +2,12 @@
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.alibaba.druid.proxy.DruidDriver
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/zero?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
     username: root
     password: root
     ######################### Druid连接池的配置信息  #################
     druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
       # 初始连接数
       initialSize: 5
       # 最小连接池数量
@@ -38,8 +36,9 @@ spring:
         enabled: true
         # 设置白名单，不填则允许所有访问
         url-pattern: /monitor/druid/*
-        login-username: user
-        login-password: user
+        # 控制台管理用户名和密码
+        login-username: zero
+        login-password: zero
       #配置扩展插件，常用的插件有=>stat:监控统计  log4j:日志  wall:防御sql注入
       filter:
         stat:
@@ -57,15 +56,20 @@ spring:
       # 热部署开关
       enabled: true
 
-
+# 防止XSS攻击
 xss:
-  enabled: false
-  excludes: 127.0.0.1
-  urlPatterns:
+  # 过滤开关
+  enabled: true
+  # 排除链接（多个用逗号分隔）
+  excludes: /system/notice
+  # 匹配链接
+  urlPatterns: /system/*,/monitor/*,/tool/*
 
 swagger:
   #是否启用swagger，默认：true
   enabled: true
+  # 请求前缀
+  pathMapping: /dev-api
   #标题
   title: 零点框架API
   #描述

@@ -1,15 +1,10 @@
 package com.zero.system.service.impl;
 
-import com.zero.common.utils.DateUtils;
+import com.zero.common.base.domain.model.LoginUser;
 import com.zero.common.utils.StringUtils;
 import com.zero.system.domain.SysUserOnline;
-import com.zero.system.mapper.SysUserOnlineMapper;
 import com.zero.system.service.ISysUserOnlineService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * 在线用户 服务层处理
@@ -18,88 +13,74 @@ import java.util.List;
  */
 @Service
 public class SysUserOnlineServiceImpl implements ISysUserOnlineService {
-    @Autowired
-    private SysUserOnlineMapper userOnlineDao;
-
     /**
-     * 通过会话序号查询信息
+     * 通过登录地址查询信息
      *
-     * @param sessionId 会话ID
+     * @param ipaddr 登录地址
+     * @param user   用户信息
      * @return 在线用户信息
      */
     @Override
-    public SysUserOnline selectOnlineById(String sessionId) {
-        return userOnlineDao.selectOnlineById(sessionId);
-    }
-
-    /**
-     * 通过会话序号删除信息
-     *
-     * @param sessionId 会话ID
-     * @return 在线用户信息
-     */
-    @Override
-    public void deleteOnlineById(String sessionId) {
-        SysUserOnline userOnline = selectOnlineById(sessionId);
-        if (StringUtils.isNotNull(userOnline)) {
-            userOnlineDao.deleteOnlineById(sessionId);
+    public SysUserOnline selectOnlineByIpaddr(String ipaddr, LoginUser user) {
+        if (StringUtils.equals(ipaddr, user.getIpaddr())) {
+            return loginUserToUserOnline(user);
         }
+        return null;
     }
 
     /**
-     * 通过会话序号删除信息
+     * 通过用户名称查询信息
      *
-     * @param sessions 会话ID集合
+     * @param userName 用户名称
+     * @param user     用户信息
      * @return 在线用户信息
      */
     @Override
-    public void batchDeleteOnline(List<String> sessions) {
-        for (String sessionId : sessions) {
-            SysUserOnline userOnline = selectOnlineById(sessionId);
-            if (StringUtils.isNotNull(userOnline)) {
-                userOnlineDao.deleteOnlineById(sessionId);
-            }
+    public SysUserOnline selectOnlineByUserName(String userName, LoginUser user) {
+        if (StringUtils.equals(userName, user.getUsername())) {
+            return loginUserToUserOnline(user);
         }
+        return null;
     }
 
     /**
-     * 保存会话信息
+     * 通过登录地址/用户名称查询信息
      *
-     * @param online 会话信息
+     * @param ipaddr   登录地址
+     * @param userName 用户名称
+     * @param user     用户信息
+     * @return 在线用户信息
      */
     @Override
-    public void saveOnline(SysUserOnline online) {
-        userOnlineDao.saveOnline(online);
+    public SysUserOnline selectOnlineByInfo(String ipaddr, String userName, LoginUser user) {
+        if (StringUtils.equals(ipaddr, user.getIpaddr()) && StringUtils.equals(userName, user.getUsername())) {
+            return loginUserToUserOnline(user);
+        }
+        return null;
     }
 
     /**
-     * 查询会话集合
+     * 设置在线用户信息
      *
-     * @param userOnline 在线用户
+     * @param user 用户信息
+     * @return 在线用户
      */
     @Override
-    public List<SysUserOnline> selectUserOnlineList(SysUserOnline userOnline) {
-        return userOnlineDao.selectUserOnlineList(userOnline);
-    }
-
-    /**
-     * 强退用户
-     *
-     * @param sessionId 会话ID
-     */
-    @Override
-    public void forceLogout(String sessionId) {
-        userOnlineDao.deleteOnlineById(sessionId);
-    }
-
-    /**
-     * 查询会话集合
-     *
-     * @param expiredDate 失效日期
-     */
-    @Override
-    public List<SysUserOnline> selectOnlineByExpired(Date expiredDate) {
-        String lastAccessTime = DateUtils.parseDateToStr(DateUtils.YYYY_MM_DD_HH_MM_SS, expiredDate);
-        return userOnlineDao.selectOnlineByExpired(lastAccessTime);
+    public SysUserOnline loginUserToUserOnline(LoginUser user) {
+        if (StringUtils.isNull(user) || StringUtils.isNull(user.getUser())) {
+            return null;
+        }
+        SysUserOnline sysUserOnline = new SysUserOnline();
+        sysUserOnline.setTokenId(user.getToken());
+        sysUserOnline.setUserName(user.getUsername());
+        sysUserOnline.setIpaddr(user.getIpaddr());
+        sysUserOnline.setLoginLocation(user.getLoginLocation());
+        sysUserOnline.setBrowser(user.getBrowser());
+        sysUserOnline.setOs(user.getOs());
+        sysUserOnline.setLoginTime(user.getLoginTime());
+        if (StringUtils.isNotNull(user.getUser().getDept())) {
+            sysUserOnline.setDeptName(user.getUser().getDept().getDeptName());
+        }
+        return sysUserOnline;
     }
 }
